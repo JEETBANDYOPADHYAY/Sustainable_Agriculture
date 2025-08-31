@@ -1,2 +1,3 @@
 # Sustainable_Agriculture
-AICTE Internship
+AICTE Internship [EduNet Foundation]
+[WEEK-1] Assignment
