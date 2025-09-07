@@ -1,3 +1,4 @@
 # Sustainable_Agriculture
 AICTE Internship [EduNet Foundation]
-[WEEK-1] Assignment
+Its contains the Week-wise Assignment of the Internship.
+
