@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro-Predict: AI-Powered Yield Forecasting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+        .input-group input, .input-group select {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            transition: all 0.2s ease-in-out;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #58a6ff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+        }
+        .btn-predict {
+            background-color: #238636;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-predict:hover {
+            background-color: #2ea043;
+            box-shadow: 0 4px 15px rgba(46, 160, 67, 0.4);
+        }
+        .result-box {
+            background-color: #1f242b;
+            border: 1px solid #30363d;
+        }
+        .result-box h3 {
+            color: #58a6ff;
+        }
+        .result-box p {
+            color: #92b1d3;
+        }
+        .result-box span {
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="container mx-auto p-6 rounded-2xl shadow-lg card">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-white mb-6">Agro-Predict: AI-Powered Yield Forecasting</h1>
+        <p class="text-center text-gray-400 mb-8">Provide the essential parameters to forecast your crop yield and assess the environmental impact through carbon footprint analysis: </p>
+
+        <!-- Prediction Form -->
+        <form id="prediction-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Soil pH -->
+            <div class="input-group flex flex-col">
+                <label for="soil-ph" class="text-sm font-medium mb-1">Soil pH</label>
+                <input type="number" step="0.05" id="soil-ph" name="Soil_pH" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 6.5">
+            </div>
+
+            <!-- Soil Moisture -->
+            <div class="input-group flex flex-col">
+                <label for="soil-moisture" class="text-sm font-medium mb-1">Soil Moisture (%)</label>
+                <input type="number" step="0.05" id="soil-moisture" name="Soil_Moisture" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 25.4">
+            </div>
+
+            <!-- Temperature -->
+            <div class="input-group flex flex-col">
+                <label for="temperature" class="text-sm font-medium mb-1">Temperature (°C)</label>
+                <input type="number" step="0.5" id="temperature" name="Temperature_C" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 28.1">
+            </div>
+
+            <!-- Rainfall -->
+            <div class="input-group flex flex-col">
+                <label for="rainfall" class="text-sm font-medium mb-1">Rainfall (mm)</label>
+                <input type="number" step="1" id="rainfall" name="Rainfall_mm" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 150">
+            </div>
+
+            <!-- Fertilizer Usage -->
+            <div class="input-group flex flex-col">
+                <label for="fertilizer-usage" class="text-sm font-medium mb-1">Fertilizer Usage (kg)</label>
+                <input type="number" step="10" id="fertilizer-usage" name="Fertilizer_Usage_kg" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 120">
+            </div>
+
+            <!-- Pesticide Usage -->
+            <div class="input-group flex flex-col">
+                <label for="pesticide-usage" class="text-sm font-medium mb-1">Pesticide Usage (kg)</label>
+                <input type="number" step="0.5" id="pesticide-usage" name="Pesticide_Usage_kg" required
+                       class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500"
+                       min="0" placeholder="e.g., 5.8">
+            </div>
+
+            <!-- Crop Type (Dropdown) -->
+            <div class="input-group flex flex-col md:col-span-2">
+                <label for="crop-type" class="text-sm font-medium mb-1">Crop Type</label>
+                <select id="crop-type" name="Crop_Type" required
+                        class="rounded-md p-3 text-sm focus:ring-2 focus:ring-blue-500">
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+
+            <!-- Hidden Fields for Model Compatibility -->
+            <input type="hidden" id="sustainability-score" name="Sustainability_Score" value="50">
+
+            <!-- Submit Button -->
+            <div class="md:col-span-2 text-center">
+                <button type="submit" class="btn-predict w-full md:w-1/2 text-white font-semibold py-3 px-6 rounded-lg text-sm transition-transform transform hover:scale-105">
+                    Predict Crop Yield
+                </button>
+            </div>
+        </form>
+
+        <!-- Prediction Result Section -->
+        <div id="result-section" class="hidden result-box p-6 rounded-lg shadow-inner">
+            <h3 class="text-lg font-bold mb-4">Prediction Results</h3>
+            <p class="mb-2">Predicted Crop Yield: <span id="predicted-yield"></span> tons</p>
+            <p class="mb-2">Carbon Emission: <span id="carbon-emission"></span> kg</p>
+            <p class="mb-2">Carbon Emission Category: <span id="carbon-category"></span></p>
+        </div>
+
+        <!-- Message Box -->
+        <div id="message-box" class="hidden absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-75 z-50">
+            <div class="bg-white p-6 rounded-lg shadow-2xl text-center text-black">
+                <p id="message-text" class="text-lg font-semibold mb-4"></p>
+                <button onclick="document.getElementById('message-box').classList.add('hidden')"
+                        class="bg-blue-600 text-white py-2 px-4 rounded-lg">
+                    OK
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="hidden flex justify-center items-center">
+            <div class="loader"></div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('prediction-form');
+            const resultSection = document.getElementById('result-section');
+            const loadingIndicator = document.getElementById('loading');
+            const cropTypeSelect = document.getElementById('crop-type');
+            
+            // Function to show a custom message box instead of alert()
+            const showMessage = (text) => {
+                const messageBox = document.getElementById('message-box');
+                document.getElementById('message-text').textContent = text;
+                messageBox.classList.remove('hidden');
+            };
+
+            // Fetch crop types from the server to populate the dropdown
+            fetch('/api/croptypes')
+                .then(response => response.json())
+                .then(data => {
+                    data.crop_types.forEach(crop => {
+                        const option = document.createElement('option');
+                        option.value = crop;
+                        option.textContent = crop;
+                        cropTypeSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching crop types:', error);
+                    showMessage('Failed to load crop types. Please check the server connection.');
+                });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                resultSection.classList.add('hidden');
+                loadingIndicator.classList.remove('hidden');
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Client-side validation to ensure no negative values
+                for (const key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        const value = parseFloat(data[key]);
+                        if (!isNaN(value) && value < 0) {
+                            loadingIndicator.classList.add('hidden');
+                            showMessage(`Input value for ${key.replace('_', ' ')} cannot be negative.`);
+                            return; // Stop form submission
+                        }
+                    }
+                }
+                
+                // Add the hardcoded sustainability score
+                data.Sustainability_Score = document.getElementById('sustainability-score').value;
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Server error occurred');
+                    }
+
+                    const result = await response.json();
+
+                    document.getElementById('predicted-yield').textContent = parseFloat(result.crop_yield).toFixed(2);
+                    document.getElementById('carbon-emission').textContent = parseFloat(result.carbon_emission).toFixed(2);
+                    document.getElementById('carbon-category').textContent = result.emission_category;
+
+                    resultSection.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Prediction failed:', error);
+                    showMessage('Prediction failed. ' + error.message);
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
